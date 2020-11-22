@@ -4,12 +4,20 @@
 }
 
 .div-square {
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
     background-color: gray;
     margin: auto;
     border: 1px solid white;
     align-items: center;
     justify-content: center;
     display: flex;
+}
+.board-container{
+    margin: 100px auto;
+    width: 400px;
+    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: repeat(3, 80px);
 }

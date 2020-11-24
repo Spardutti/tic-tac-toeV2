@@ -1,8 +1,11 @@
 (function game() {
-  let playerTurn = 0;
   //module
   const Gameboard = (() => {
-    let gameboard = new Array(9).fill("");
+    let gameboard = [
+      ["", "", ""],
+      ["", "", ""],
+      ["", "", ""],
+    ];
 
     return { gameboard };
   })();
@@ -11,81 +14,121 @@
   const PlayerFactory = (player, selection) => {
     return { player, selection };
   };
-
-  const player = PlayerFactory("player", "x");
-  const computer = PlayerFactory("computer", "o");
-
-  //display gameboard
-  function displayGameboard(board) {
-    let contenDiv = document.getElementById("content");
-    let boardContainer = document.createElement("div");
-    boardContainer.setAttribute("class", "board-container");
-
+  //variables
+  const player = PlayerFactory("player", "O");
+  const computer = PlayerFactory("computer", "X");
+  let activePlayer = player;
+  let container = document.getElementById("content");
+  let winner = false;
+  //display the initial gameboard
+  function displayGameBoard(board) {
     for (let i = 0; i < board.length; i++) {
-      let divSquare = document.createElement("div");
-      divSquare.setAttribute("id", i);
-      divSquare.setAttribute("class", "div-square");
-      divSquare.addEventListener("click", () => {
-        playerPlay(board);
-      });
-      boardContainer.appendChild(divSquare);
-    }
-    contenDiv.appendChild(boardContainer);
-  }
-
-  displayGameboard(Gameboard.gameboard);
-
-  //game logic
-  function playerPlay(board) {
-    let id = event.target.id;
-    let clickedDiv = document.getElementById(id);
-    if (clickedDiv.innerHTML == "" && playerTurn == 0) {
-      clickedDiv.innerHTML = player.selection;
-      board.splice(id, 1, player.selection);
-      playerTurn = 1;
-      checkWinner(player.selection, board);
-      setTimeout(() => {
-        computerPlay(board);
-      }, 1000);
-    }
-  }
-  //NOT WORKING PROPERLY, will keep generating number after full array
-  function computerPlay(board) {
-    if (board.some((e) => e === "")) {
-      let id = Math.floor(Math.random() * 9);
-      let clickedDiv = document.getElementById(id);
-      while (clickedDiv.innerHTML != "") {
-        let id = Math.floor(Math.random() * 9);
-        clickedDiv = document.getElementById(id);
+      for (let j = 0; j < board.length; j++) {
+        let square = document.createElement("div");
+        square.setAttribute("class", "div-square");
+        square.innerHTML = board[i][j];
+        square.setAttribute("id", [i, j]);
+        square.addEventListener("click", () => {
+          playerTurn(board);
+        });
+        container.appendChild(square);
       }
-      clickedDiv.innerHTML = computer.selection;
-      board.splice(id, 1, computer.selection);
-      checkWinner(computer.selection, board)
-      playerTurn = 0;
-    } else console.log("all taken");
+    }
   }
-
-  function checkWinner(selection, board) {
-    const vertical = [0, 3, 6].map((i) => {
-      return [i, i + 1, i + 2];
-    });
-    const horitzontal = [0, 1, 2].map((i) => {
-      return [i, i + 3, i + 6];
-    });
-    const diagonal = [
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
-    const winnerArr = [].concat(vertical).concat(horitzontal).concat(diagonal);
-    let result = winnerArr.some((e) => {
-      return (
-        board[e[0]] == selection &&
-        board[e[1]] == selection &&
-        board[e[2]] == selection
-      );
-    });
-    if (result) {
-      alert("WIN");
+  displayGameBoard(Gameboard.gameboard);
+  //player plays
+  function playerTurn(board) {
+    if (activePlayer == player && winner == false) {
+      let id = event.target.id;
+      let square = document.getElementById(id);
+      let num1 = id[0];
+      let num2 = id[2];
+      if (board[num1][num2] == "") {
+        board[num1][num2] = player.selection;
+        square.innerHTML = player.selection;
+        activePlayer = computer;
+        checkWinner(board, player);
+        computerTurn(board);
+      }
+    }
+  }
+  //computer plays
+  function computerTurn(board) {
+    if (activePlayer == computer && winner == false) {
+      let available = availableIndex(board);
+      let randomIndex = Math.floor(Math.random() * available.length);
+      let getIndex = available[randomIndex];
+      let square = document.getElementById(getIndex.i + "," + getIndex.j);
+      square.innerHTML = computer.selection;
+      board[getIndex.i][getIndex.j] = computer.selection;
+      checkWinner(board, computer);
+      activePlayer = player;
+      console.log(board);
+    }
+  }
+  //check for free spots
+  function availableIndex(board) {
+    let available = [];
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (board[i][j] == "") {
+          available.push({ i, j });
+        }
+      }
+    }
+    return available;
+  }
+  //win conditions
+  function checkWinner(board, player) {
+    let available = availableIndex(board);
+    //check for Tie
+    if (available.length == 0) {
+      alert("tie");
+      return (winner = true);
+    }
+    //HORIZONTAL
+    for (let i = 0; i < 3; i++) {
+      if (
+        board[i][0] == player.selection &&
+        board[i][0] == board[i][1] &&
+        board[i][1] == board[i][2]
+      ) {
+        alert(`${player.player} WINS`);
+        return (winner = true);
+      }
+    }
+    //VERTICAL
+    for (let i = 0; i < 3; i++) {
+      if (
+        board[0][i] == player.selection &&
+        board[0][i] == board[1][i] &&
+        board[1][i] == board[2][i]
+      ) {
+        alert(`${player.player} WINS`);
+        return (winner = true);
+      }
+    }
+    //DIAGONAL
+    for (let i = 0; i < 3; i++) {
+      if (
+        board[0][0] == player.selection &&
+        board[0][0] == board[1][1] &&
+        board[1][1] == board[2][2]
+      ) {
+        alert(`${player.player} WINS`);
+        return (winner = true);
+      }
+    }
+    //DIAGONAL
+    for (let i = 0; i < 3; i++) {
+      if (
+        board[0][2] == player.selection &&
+        board[0][2] == board[1][1] &&
+        board[1][1] == board[2][0]
+      ) {
+        alert(`${player.player} WINS`);
+        return (winner = true);
+      }
     }
   }
 })();

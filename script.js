@@ -69,7 +69,7 @@
             board[i][j] = computer.selection;
             let result = checkWinner();
             if( result != null){
-              alert("win")
+              alert("Computer Win")
             }
             let score = minimax(board, 0, false);
             board[i][j] = "";

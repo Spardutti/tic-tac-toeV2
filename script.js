@@ -166,7 +166,7 @@
   function match3(a, b, c) {
     return a == b && b == c && a != "";
   }
-
+//check if winner
   function checkWinner() {
     let winner = null;
     //check for 3 consecutive

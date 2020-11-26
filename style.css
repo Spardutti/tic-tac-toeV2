@@ -14,10 +14,32 @@
     display: flex;
 }
 #content{
-    margin: 100px auto;
-    width: 400px;
+    margin: 50px auto;
     justify-content: center;
     display: grid;
     grid-template-columns: repeat(3, 80px);
     grid-template-rows: repeat(3, 80px);
+}
+.hidden{
+    visibility: hidden;
+}
+.visible {
+    visibility: visible;
+}
+#container {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+}
+button{
+    margin-left: 5px;
+}
+#buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+}
+.message{
+    display: flex;
+justify-content: center;
 }
